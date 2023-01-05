@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ $1 ]
+then
+  rtl_num_devices=$(rtl_eeprom 2>&1 | grep -Po '(?i)found\s*\K\d+(?=)')
+  if [ -n $rtl_num_devices ]
+  then
+    for i in $(seq $rtl_num_devices);
+    do
+      rtl_device=$((i-1))
+      rtl_serial=$(rtl_eeprom -d$rtl_device 2>&1 | grep -Po '(?i)serial number:\s*\K\d+(?=)')
+      if [ "$1" = "$rtl_serial" ]
+      then
+        echo $rtl_device
+      fi
+    done
+  fi
+else
+    echo "Get the device number of the dongle."
+    echo "usage: rtl_device <serial_number>"
+fi
