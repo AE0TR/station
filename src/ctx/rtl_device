@@ -5,7 +5,7 @@ then
   rtl_num_devices=$(rtl_eeprom 2>&1 | grep -Po '(?i)found\s*\K\d+(?=)')
   if [ -n $rtl_num_devices ]
   then
-    for i in $(seq $rtl_num_devices);
+    for i in $(seq 1 $rtl_num_devices);
     do
       rtl_device=$((i-1))
       rtl_serial=$(rtl_eeprom -d$rtl_device 2>&1 | grep -Po '(?i)serial number:\s*\K\d+(?=)')

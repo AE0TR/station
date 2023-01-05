@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  adsb:
+    image: sdr:tools
+    devices: 
+      - /dev/bus/usb/001/005
+    ports: 
+      - "1230:1230"
+    volumes: 
+      - "./context/bin/adsb.sh:/entrypoint.sh"
+    environment:
+      - "RTL_SN=1230"
+    entrypoint: "/entrypoint.sh"
+    restart: unless-stopped
+    networks: 
+      - internal
+  spy:
+    image: gizmotronic/spyserver
+    devices:
+      - /dev/bus/usb/001/004
+    environment:
+      - LIST_IN_DIRECTORY=0
+      - DEVICE_TYPE=RTL-SDR
+      - BIND_PORT=5555
+      - RTL_SN=1231
+    ports:
+      - "5555:5555"
+    restart: unless-stopped
+  mq:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - "./src/ctx/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+    restart: unless-stopped
+    networks:
+      - internal
+networks:
+  internal:
