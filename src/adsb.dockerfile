@@ -1,4 +1,4 @@
-FROM sdr:tools
+FROM sdr-tools
 
 RUN apk add --no-cache \
     mosquitto-clients \
