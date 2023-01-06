@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  spy:
+    image: gizmotronic/spyserver
+    devices:
+      - /dev/bus/usb/001/004
+    environment:
+      - LIST_IN_DIRECTORY=0
+      - DEVICE_TYPE=RTL-SDR
+      - BIND_PORT=5555
+      - RTL_SN=1231
+    ports:
+      - "5555:5555"
+    restart: unless-stopped
+    networks:
+      - spynet
+networks:
+  spynet:
