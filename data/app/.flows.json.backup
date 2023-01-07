@@ -1,0 +1,327 @@
+[
+    {
+        "id": "9f9f7ab3b8722285",
+        "type": "tab",
+        "label": "ADS-B Decode/Store",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "10481e453ab4632e",
+        "type": "mqtt-broker",
+        "name": "adsb broker",
+        "broker": "mq",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "dd27026bf2d1b1d2",
+        "type": "debug",
+        "z": "9f9f7ab3b8722285",
+        "name": "valid",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "13e3bc52b0e9405e",
+        "type": "mqtt in",
+        "z": "9f9f7ab3b8722285",
+        "name": "",
+        "topic": "adsb/raw",
+        "qos": "2",
+        "datatype": "utf8",
+        "broker": "10481e453ab4632e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 60,
+        "wires": [
+            [
+                "4346434c2e0d4a74"
+            ]
+        ]
+    },
+    {
+        "id": "4346434c2e0d4a74",
+        "type": "function",
+        "z": "9f9f7ab3b8722285",
+        "name": "hex -> buffer",
+        "func": "var s = msg.payload.replace(/[^0-9a-fA-F]/g,'');\nmsg.payload = bigintConversion.hexToBuf(s);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "bigintConversion",
+                "module": "bigint-conversion"
+            }
+        ],
+        "x": 310,
+        "y": 60,
+        "wires": [
+            [
+                "0a82882649e4a1e6"
+            ]
+        ]
+    },
+    {
+        "id": "0a82882649e4a1e6",
+        "type": "function",
+        "z": "9f9f7ab3b8722285",
+        "name": "mode s decoder",
+        "func": "const decoder = new modeSDecoder()\nmsg.payload=decoder.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "modeSDecoder",
+                "module": "mode-s-decoder"
+            }
+        ],
+        "x": 520,
+        "y": 60,
+        "wires": [
+            [
+                "42cc9ddfb2c5365f"
+            ]
+        ]
+    },
+    {
+        "id": "5832be72b0373634",
+        "type": "function",
+        "z": "9f9f7ab3b8722285",
+        "name": "mode s aircraft store",
+        "func": "const store = flow.get('store');\nstore.addMessage(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\nvar store = flow.get('store');\nif(!store){\n    store = new modeSAircraftStore({\n        timeout: 120000\n    });\n    flow.set('store', store);\n    console.log('Aircraft data storage initialized.')\n}\n",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "modeSAircraftStore",
+                "module": "mode-s-aircraft-store"
+            }
+        ],
+        "x": 940,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3ea2167885acf87c",
+        "type": "function",
+        "z": "9f9f7ab3b8722285",
+        "name": "read aircraft store",
+        "func": "const store = flow.get('store');\nmsg.payload = store.getAircrafts();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 200,
+        "wires": [
+            [
+                "d401ad174bf84da4"
+            ]
+        ]
+    },
+    {
+        "id": "5b4d633277398fca",
+        "type": "inject",
+        "z": "9f9f7ab3b8722285",
+        "name": "read store trigger",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "aircraft",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 140,
+        "wires": [
+            [
+                "3ea2167885acf87c"
+            ]
+        ]
+    },
+    {
+        "id": "42cc9ddfb2c5365f",
+        "type": "function",
+        "z": "9f9f7ab3b8722285",
+        "name": "filter by crc",
+        "func": "\nreturn msg.payload.crcOk ? msg : null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 60,
+        "wires": [
+            [
+                "5832be72b0373634"
+            ]
+        ]
+    },
+    {
+        "id": "d401ad174bf84da4",
+        "type": "split",
+        "z": "9f9f7ab3b8722285",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 450,
+        "y": 300,
+        "wires": [
+            [
+                "1ed300b9ca08d982"
+            ]
+        ]
+    },
+    {
+        "id": "1ed300b9ca08d982",
+        "type": "switch",
+        "z": "9f9f7ab3b8722285",
+        "name": "callsign",
+        "property": "payload.callsign",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nempty"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 620,
+        "y": 320,
+        "wires": [
+            [
+                "df716e2a30a5511f"
+            ],
+            [
+                "76bbfe7ef8bd4523"
+            ]
+        ]
+    },
+    {
+        "id": "df716e2a30a5511f",
+        "type": "switch",
+        "z": "9f9f7ab3b8722285",
+        "name": "position",
+        "property": "payload.lon",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 780,
+        "y": 220,
+        "wires": [
+            [
+                "dd27026bf2d1b1d2",
+                "6f75a2064de4d1ef"
+            ],
+            [
+                "76bbfe7ef8bd4523"
+            ]
+        ]
+    },
+    {
+        "id": "76bbfe7ef8bd4523",
+        "type": "debug",
+        "z": "9f9f7ab3b8722285",
+        "name": "incomplete",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 950,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "6f75a2064de4d1ef",
+        "type": "mqtt out",
+        "z": "9f9f7ab3b8722285",
+        "name": "",
+        "topic": "adsb/aircraft",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "10481e453ab4632e",
+        "x": 930,
+        "y": 140,
+        "wires": []
+    }
+]

@@ -1,0 +1,14 @@
+{
+    "bigint-conversion": {
+        "spec": "bigint-conversion",
+        "module": "bigint-conversion",
+        "builtin": false,
+        "known": false
+    },
+    "mode-s-decoder": {
+        "spec": "mode-s-decoder",
+        "module": "mode-s-decoder",
+        "builtin": false,
+        "known": false
+    }
+}

@@ -27,7 +27,7 @@ services:
     depends_on:
       - mq
     networks: 
-      - app-net
+      - app_net
   mq:
     image: eclipse-mosquitto
     ports:
@@ -36,7 +36,7 @@ services:
       - "./src/ctx/mosquitto.conf:/mosquitto/config/mosquitto.conf"
     restart: unless-stopped
     networks:
-      - app-net
+      - app_net
   db:
     image: mongo:4.2.23
     ports: 
@@ -48,8 +48,8 @@ services:
       - db_store:/data/db
     restart: unless-stopped
     networks:
-      - app-net
-      - admin-net
+      - app_net
+      - admin_net
   db-admin:
     image: mongo-express
     restart: unless-stopped
@@ -62,8 +62,8 @@ services:
     depends_on:
       - db
     networks:
-      - admin-net
-   app:
+      - admin_net
+  app:
     image: nodered/node-red
     restart: unless-stopped
     ports:
@@ -71,12 +71,13 @@ services:
     volumes:
       - "./data/app:/data"
     depends_on:
-      - mq
+      - adsb
       - db
+      - mq
     networks:
-      - app-net
+      - app_net
 volumes:
   db_store:
 networks:
-  app-net:
-  admin-net:
+  app_net:
+  admin_net:

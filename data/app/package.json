@@ -1,0 +1,12 @@
+{
+    "name": "node-red-project",
+    "description": "A Node-RED Project",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "bigint-conversion": "^2.3.0",
+        "mode-s-aircraft-store": "^1.0.1",
+        "mode-s-decoder": "^1.0.1",
+        "node-red-contrib-counter": "~0.1.6"
+    }
+}
