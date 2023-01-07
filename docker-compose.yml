@@ -12,8 +12,6 @@ services:
     ports:
       - "5555:5555"
     restart: unless-stopped
-    networks:
-      - spynet
   adsb:
     image: sdr-adsb
     devices: 
@@ -29,7 +27,7 @@ services:
     depends_on:
       - mq
     networks: 
-      - srcnet
+      - app-net
   mq:
     image: eclipse-mosquitto
     ports:
@@ -38,7 +36,47 @@ services:
       - "./src/ctx/mosquitto.conf:/mosquitto/config/mosquitto.conf"
     restart: unless-stopped
     networks:
-      - srcnet
+      - app-net
+  db:
+    image: mongo:4.2.23
+    ports: 
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - db_store:/data/db
+    restart: unless-stopped
+    networks:
+      - app-net
+      - admin-net
+  db-admin:
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@db:27017/
+    depends_on:
+      - db
+    networks:
+      - admin-net
+   app:
+    image: nodered/node-red
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    volumes:
+      - "./data/app:/data"
+    depends_on:
+      - mq
+      - db
+    networks:
+      - app-net
+volumes:
+  db_store:
 networks:
-  spynet:
-  srcnet:
+  app-net:
+  admin-net:
