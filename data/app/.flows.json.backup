@@ -8,6 +8,14 @@
         "env": []
     },
     {
+        "id": "4c08408ab6c64673",
+        "type": "tab",
+        "label": "Aircraft tracking",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "10481e453ab4632e",
         "type": "mqtt-broker",
         "name": "adsb broker",
@@ -35,6 +43,14 @@
         "sessionExpiry": ""
     },
     {
+        "id": "9fc131cab3d5fdc0",
+        "type": "mongodb",
+        "hostname": "db",
+        "port": "27017",
+        "db": "station",
+        "name": ""
+    },
+    {
         "id": "dd27026bf2d1b1d2",
         "type": "debug",
         "z": "9f9f7ab3b8722285",
@@ -47,8 +63,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 970,
-        "y": 200,
+        "x": 690,
+        "y": 360,
         "wires": []
     },
     {
@@ -153,8 +169,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 430,
-        "y": 200,
+        "x": 450,
+        "y": 140,
         "wires": [
             [
                 "d401ad174bf84da4"
@@ -220,8 +236,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 450,
-        "y": 300,
+        "x": 670,
+        "y": 140,
         "wires": [
             [
                 "1ed300b9ca08d982"
@@ -246,8 +262,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 2,
-        "x": 620,
-        "y": 320,
+        "x": 220,
+        "y": 280,
         "wires": [
             [
                 "df716e2a30a5511f"
@@ -277,8 +293,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 2,
-        "x": 780,
-        "y": 220,
+        "x": 480,
+        "y": 260,
         "wires": [
             [
                 "dd27026bf2d1b1d2",
@@ -302,8 +318,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 950,
-        "y": 380,
+        "x": 710,
+        "y": 440,
         "wires": []
     },
     {
@@ -320,8 +336,82 @@
         "correl": "",
         "expiry": "",
         "broker": "10481e453ab4632e",
-        "x": 930,
+        "x": 790,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "2b88e706b183b479",
+        "type": "mongodb out",
+        "z": "4c08408ab6c64673",
+        "mongodb": "9fc131cab3d5fdc0",
+        "name": "save aircraft",
+        "collection": "aircraft",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 690,
         "y": 140,
         "wires": []
+    },
+    {
+        "id": "b0108e0c63b95f0c",
+        "type": "mqtt in",
+        "z": "4c08408ab6c64673",
+        "name": "",
+        "topic": "adsb/aircraft",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "10481e453ab4632e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 140,
+        "wires": [
+            [
+                "1054e91bca84b983",
+                "c3e73d9da59ae796"
+            ]
+        ]
+    },
+    {
+        "id": "1054e91bca84b983",
+        "type": "debug",
+        "z": "4c08408ab6c64673",
+        "name": "seen",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 430,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "c3e73d9da59ae796",
+        "type": "rbe",
+        "z": "4c08408ab6c64673",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": false,
+        "property": "payload.seen",
+        "topi": "topic",
+        "x": 330,
+        "y": 220,
+        "wires": [
+            [
+                "2b88e706b183b479"
+            ]
+        ]
     }
 ]

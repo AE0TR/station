@@ -434,5 +434,26 @@
                 "file": "/data/node_modules/node-red-contrib-counter/counter.js"
             }
         }
+    },
+    "node-red-mongodb": {
+        "name": "node-red-mongodb",
+        "version": "0.0.18",
+        "local": true,
+        "user": true,
+        "nodes": {
+            "mongo": {
+                "name": "mongo",
+                "types": [
+                    "mongodb",
+                    "mongodb out",
+                    "mongodb in"
+                ],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-mongodb",
+                "file": "/data/node_modules/node-red-mongodb/66-mongodb.js"
+            }
+        }
     }
 }
